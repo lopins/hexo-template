@@ -1,0 +1,53 @@
+name: GitHub Pages - CI
+
+on:
+  push:
+    paths-ignore:
+      - "images/**"
+      - "LICENSE"
+      - "README.md"
+      - "README_**"
+      - "README-**"
+    branches: 
+      - main
+  pull_request:
+    branches: 
+      - main 
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          submodules: true
+          fetch_depth: 1
+          persist-credentials: false
+
+      - name: Setup Node 🔧
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+      
+      - name: Install Dependencies and Build 🔧
+        run: |
+          npm install
+          npm run build
+        env:
+          CI: false
+
+      - name: Deploy 🚀
+        uses: peaceiris/actions-gh-pages@v4
+        with:   
+          github_token: ${{ secrets.GITHUB_TOKEN }}       
+          publish_branch: gh-pages  # default: gh-pages
+          publish_dir: ./public     # default: public
+          # cname: github.com
+          # user_name: 'github-actions[bot]'
+          # user_email: 'github-actions[bot]@users.noreply.github.com'
+          # commit_message: ${{ github.event.head_commit.message }}
+          # full_commit_message: ${{ github.event.head_commit.message }}
+          # enable_jekyll: true
